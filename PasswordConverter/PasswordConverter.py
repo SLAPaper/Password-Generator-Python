@@ -1,10 +1,10 @@
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import ttk, tix
-from collections import OrderedDict
 
 import hashlib
 import base64
+
 
 class tolist_frozenset(frozenset):
     def __init__(self, obj):
@@ -39,36 +39,49 @@ class PasswordConverter(ttk.Frame):
         self.__createWidgets()
         
     def __createWidgets(self) -> None:
+        # <pane>
         self.pane = ttk.PanedWindow(self, orient=tix.HORIZONTAL)
         self.pane.rowconfigure(0, weight=1)
         self.pane.rowconfigure(1, weight=1)
         self.pane.columnconfigure(1, weight=1)
         self.pane.grid(column=0, row=0, sticky=STICK_HORIZONTAL.s2t())
 
-        self.pane.key_label = ttk.Label(self.pane)
-        self.pane.key_label["text"] = "Key:"
-        self.pane.key_label.grid(column=0, row=0, sticky=STICK_W.s2t())
+        self.key_label = ttk.Label(self.pane)
+        self.key_label["text"] = "Key:"
+        self.key_label.grid(column=0, row=0, sticky=STICK_W.s2t())
 
         self.key_value = tk.StringVar()
-        self.pane.key = ttk.Entry(self.pane, textvariable=self.key_value)
-        self.pane.key.grid(column=1, row=0, sticky=STICK_ALL.s2t(), padx=(5, 2), pady=(1, 2))
-        self.pane.key.focus_set()
+        self.key = ttk.Entry(self.pane, textvariable=self.key_value)
+        self.key.grid(column=1, row=0, sticky=STICK_ALL.s2t(), padx=(5, 2), pady=(1, 2))
+        self.key.focus_set()
 
-        self.pane.salt_label = ttk.Label(self.pane)
-        self.pane.salt_label["text"] = "Salt:"
-        self.pane.salt_label.grid(column=0, row=1, sticky=STICK_W.s2t())
+        self.salt_label = ttk.Label(self.pane)
+        self.salt_label["text"] = "Salt:"
+        self.salt_label.grid(column=0, row=1, sticky=STICK_W.s2t())
 
         self.salt_value = tk.StringVar()
-        self.pane.salt = ttk.Entry(self.pane, textvariable=self.salt_value)
-        self.pane.salt.grid(column=1, row=1, sticky=STICK_ALL.s2t(), padx=(5, 2), pady=(2, 1))
+        self.salt = ttk.Entry(self.pane, textvariable=self.salt_value)
+        self.salt.grid(column=1, row=1, sticky=STICK_ALL.s2t(), padx=(5, 2), pady=(2, 1))
 
-        self.pane.button = ttk.Button(self.pane)
-        self.pane.button["text"] = "计算！"
-        self.pane.button["command"] = self.generate_password
-        self.pane.button.grid(column=2, rowspan=2, row=0, sticky=STICK_VERTICAL.s2t(), padx=(2, 0))
+        self.button = ttk.Button(self.pane)
+        self.button["text"] = "计算！"
+        self.button["command"] = self.generate_password
+        self.button.grid(column=2, rowspan=2, row=0, sticky=STICK_VERTICAL.s2t(), padx=(2, 0))
+        # </pane>
 
-        self.text = tix.Text(self, autosep=1)
-        self.text.grid(column=0, row=1, sticky=STICK_ALL.s2t(), padx=5)
+        # <scrollpane>
+        self.scrollpane = ttk.PanedWindow(self, orient=tix.HORIZONTAL)
+        self.scrollpane.grid(column=0, row=1, sticky=STICK_ALL.s2t(), padx=5)
+
+        self.scrollbar = ttk.Scrollbar(self.scrollpane)
+        self.scrollbar.pack(side=tix.RIGHT, fill=tix.Y)
+
+        self.text = tix.Text(self.scrollpane, autosep=1, yscrollcommand=self.scrollbar.set)
+        self.text.pack(side=tix.LEFT, fill=tix.BOTH)
+        self.text['state'] = 'disabled'
+
+        self.scrollbar["command"] = self.text.yview
+        # </scrollpane>
 
         self.quit_btn = ttk.Button(self, text="退出！", style="red.TButton", command=self.master.destroy)
         self.quit_btn.grid(column=0, row=2, sticky=STICK_ALL.s2t(), ipady=5)
