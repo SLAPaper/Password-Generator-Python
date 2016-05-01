@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.font as tkFont
-from tkinter import ttk, tix
+from tkinter import ttk
+from tkinter import tix
 
 import hashlib
 import base64
@@ -12,10 +13,10 @@ class tolist_frozenset(frozenset):
 
     def s2l(self):
         return list(self)
-    
+
     def s2t(self):
         return tuple(self)
-    
+
     def __sub__(self, other, *args):
         return tolist_frozenset(super().difference(other, *args))
 
@@ -28,6 +29,7 @@ STICK_W = tolist_frozenset([tix.W])
 STICK_S = tolist_frozenset([tix.S])
 STICK_E = tolist_frozenset([tix.E])
 
+
 class PasswordConverter(ttk.Frame):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -37,7 +39,7 @@ class PasswordConverter(ttk.Frame):
 
         self.pack(fill=tix.BOTH, expand=True)
         self.__createWidgets()
-        
+
     def __createWidgets(self) -> None:
         # <pane>
         self.pane = ttk.PanedWindow(self, orient=tix.HORIZONTAL)
@@ -52,7 +54,11 @@ class PasswordConverter(ttk.Frame):
 
         self.key_value = tk.StringVar()
         self.key = ttk.Entry(self.pane, textvariable=self.key_value)
-        self.key.grid(column=1, row=0, sticky=STICK_ALL.s2t(), padx=(5, 2), pady=(1, 2))
+        self.key.grid(column=1,
+                      row=0,
+                      sticky=STICK_ALL.s2t(),
+                      padx=(5, 2),
+                      pady=(1, 2))
         self.key.focus_set()
 
         self.salt_label = ttk.Label(self.pane)
@@ -61,12 +67,20 @@ class PasswordConverter(ttk.Frame):
 
         self.salt_value = tk.StringVar()
         self.salt = ttk.Entry(self.pane, textvariable=self.salt_value)
-        self.salt.grid(column=1, row=1, sticky=STICK_ALL.s2t(), padx=(5, 2), pady=(2, 1))
+        self.salt.grid(column=1,
+                       row=1,
+                       sticky=STICK_ALL.s2t(),
+                       padx=(5, 2),
+                       pady=(2, 1))
 
         self.button = ttk.Button(self.pane)
         self.button["text"] = "计算！"
         self.button["command"] = self.generate_password
-        self.button.grid(column=2, rowspan=2, row=0, sticky=STICK_VERTICAL.s2t(), padx=(2, 0))
+        self.button.grid(column=2,
+                         rowspan=2,
+                         row=0,
+                         sticky=STICK_VERTICAL.s2t(),
+                         padx=(2, 0))
         # </pane>
 
         # <scrollpane>
@@ -76,21 +90,27 @@ class PasswordConverter(ttk.Frame):
         self.scrollbar = ttk.Scrollbar(self.scrollpane)
         self.scrollbar.pack(side=tix.RIGHT, fill=tix.Y)
 
-        self.text = tix.Text(self.scrollpane, autosep=1, yscrollcommand=self.scrollbar.set)
+        self.text = tix.Text(self.scrollpane,
+                             autosep=1,
+                             yscrollcommand=self.scrollbar.set)
         self.text.pack(side=tix.LEFT, fill=tix.BOTH)
         self.text['state'] = 'disabled'
 
         self.scrollbar["command"] = self.text.yview
         # </scrollpane>
 
-        self.quit_btn = ttk.Button(self, text="退出！", style="red.TButton", command=self.master.destroy)
+        self.quit_btn = ttk.Button(self,
+                                   text="退出！",
+                                   style="red.TButton",
+                                   command=self.master.destroy)
         self.quit_btn.grid(column=0, row=2, sticky=STICK_ALL.s2t(), ipady=5)
 
     def generate_password(self) -> None:
         self.text['state'] = 'normal'
         self.text.delete('1.0', 'end')
         raw_input = self.key_value.get() + self.salt_value.get()
-        hashers = (hashlib.md5, hashlib.sha1, hashlib.sha224,  hashlib.sha256,  hashlib.sha384,  hashlib.sha512)
+        hashers = (hashlib.md5, hashlib.sha1, hashlib.sha224, hashlib.sha256,
+                   hashlib.sha384, hashlib.sha512)
         output_strings = []
         for hasher_init in hashers:
             hasher = hasher_init()
@@ -101,18 +121,21 @@ class PasswordConverter(ttk.Frame):
             b64_output = base64.standard_b64encode(digest).decode()
             a85_output = base64.a85encode(digest).decode()
             b85_output = base64.b85encode(digest).decode()
-            output_strings.append("hash: %s\nresult: %s\nbase64: %s\nascii85: %s\nbase85: %s\n" % (name, hexdigest, b64_output, a85_output, b85_output))
-        
+            output_strings.append(
+                "hash: %s\nresult: %s\nbase64: %s\nascii85: %s\nbase85: %s\n" %
+                (name, hexdigest, b64_output, a85_output, b85_output))
+
         for output_string in output_strings:
             self.text.insert('end', output_string + '\n')
 
         self.text['state'] = 'disabled'
 
+
 if __name__ == "__main__":
     root = tix.Tk()
     root.title("纸睡的密码生成器")
     root.geometry('600x400')
-    
+
     tkFont.nametofont("TkDefaultFont").config(family="Dengxian", size=11)
 
     style = ttk.Style()
