@@ -1,4 +1,4 @@
-from TkUtil import *
+from TkUtil import STICK_ALL, STICK_HORIZONTAL, STICK_VERTICAL, STICK_E, STICK_N, STICK_S, STICK_W
 
 import tkinter as tk
 import tkinter.font as tkFont
@@ -74,7 +74,9 @@ class PasswordConverter(ttk.Frame):
         self.text.grid(column=0, row=0, sticky=tuple(STICK_ALL))
         self.text['state'] = 'disabled'
 
-        self.scrollbar = ttk.Scrollbar(self.scrollpane, orient=tix.VERTICAL, command=self.text.yview)
+        self.scrollbar = ttk.Scrollbar(self.scrollpane,
+                                       orient=tix.VERTICAL,
+                                       command=self.text.yview)
         self.scrollbar.grid(column=1, row=0, sticky=tuple(STICK_ALL))
 
         self.text['yscrollcommand'] = self.scrollbar.set
@@ -83,20 +85,22 @@ class PasswordConverter(ttk.Frame):
     def generate_password(self) -> None:
         self.text['state'] = 'normal'
         self.text.delete('1.0', 'end')
-        raw_input = self.key_value.get() + self.salt_value.get() # type: str
+        raw_input = self.key_value.get() + self.salt_value.get()  # type: str
         hashers = (hashlib.md5, hashlib.sha1, hashlib.sha224, hashlib.sha256,
                    hashlib.sha384, hashlib.sha512)
-        output_strings = [] # type: tg.List[str]
+        output_strings = []  # type: tg.List[str]
         for hasher_init in hashers:
             hasher = hasher_init()
-            name = hasher.name # type: str
+            name = hasher.name  # type: str
             hasher.update(raw_input.encode())
             digest = hasher.digest()
             hexdigest = hasher.hexdigest()
             b64_output = base64.standard_b64encode(digest).decode()
             a85_output = base64.a85encode(digest).decode()
             b85_output = base64.b85encode(digest).decode()
-            output_strings.append("hash: %s\nresult: %s\nbase64: %s\nascii85: %s\nbase85: %s\n" % (name, hexdigest, b64_output, a85_output, b85_output))
+            output_strings.append(
+                "hash: %s\nresult: %s\nbase64: %s\nascii85: %s\nbase85: %s\n" %
+                (name, hexdigest, b64_output, a85_output, b85_output))
 
         for output_string in output_strings:
             self.text.insert('end', output_string + '\n')
@@ -114,7 +118,6 @@ if __name__ == "__main__":
 
     style = ttk.Style()
     style.configure("basic.TFrame", foreground="black")
-    style.configure("red.TButton", foreground="red")
 
     mainframe = PasswordConverter(master=root, style="basic.TFrame")
 
